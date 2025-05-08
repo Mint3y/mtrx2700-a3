@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "stm32f3xx_hal.h"
+
 // Beats for rhythm game
 // #define OOOO 0b00000000
 // #define OOOX 0b00000001
@@ -31,6 +33,19 @@
 #define OOXO 0b00000010
 #define OXOO 0b00000100
 #define XOOO 0b00001000
+
+// LED pin definitions
+#define LED_PIN_0 GPIO_PIN_0
+#define LED_PIN_1 GPIO_PIN_1
+#define LED_PIN_2 GPIO_PIN_2
+#define LED_PIN_3 GPIO_PIN_3
+#define LED_PIN_COUNT 4
+
+// Input button pin definitions
+#define INPUT_PIN_0 GPIO_PIN_1
+#define INPUT_PIN_1 GPIO_PIN_2
+#define INPUT_PIN_2 GPIO_PIN_3
+#define INPUT_PIN_3 GPIO_PIN_4
 
 typedef struct {
     bool     playing;

@@ -9,14 +9,39 @@ static int8_t pattern_1[] = {
     XOOO
 };
 
+// The pins used for displaying LEDs
+static GPIO_TypeDef* LED_GPIO = GPIOC;
+static uint16_t LED_PINS[LED_PIN_COUNT] = {
+    LED_PIN_0,
+    LED_PIN_1,
+    LED_PIN_2,
+    LED_PIN_3
+};
+static uint16_t LED_PINS_BITMASK = (GPIO_PIN_0
+                                 |  GPIO_PIN_1
+                                 |  GPIO_PIN_2
+                                 |  GPIO_PIN_3);
+
+// The pins used for input
+//static GPIO_TypeDef* INPUT_GPIO = GPIOA;
+//static uint16_t INPUT_PINS[4] = {
+//    INPUT_PIN_0,
+//    INPUT_PIN_1,
+//    INPUT_PIN_2,
+//	INPUT_PIN_3
+//};
+
 // Beat player
 static Beats display;
 static Beats input;
 static uint32_t level_number = 0;
-
 // TODO: input settings
-// input timeout frequency
+static uint16_t INPUT_TIMEOUT_MS = 30000; // TODO configure timeout to something that isnt 30000ms
 // TODO: input alignment factor (how close to the actual beat the player needs to hit)
+
+void clear_beats_leds() {
+    HAL_GPIO_WritePin(LED_GPIO, LED_PINS_BITMASK, GPIO_PIN_RESET);
+}
 
 void reset_beats(Beats* beats) {
     // TODO: Stop beats timer
@@ -28,7 +53,8 @@ void reset_beats(Beats* beats) {
     beats->pattern = 0x00;
     beats->finally = 0x00;
 
-    // TODO: override all LEDs with LOW
+    // Clear LED pins
+    clear_beats_leds();
 }
 
 void init_beats() {
@@ -44,7 +70,7 @@ void finalise_beats(Beats* beats) {
         beats->finally();
     }
 
-    reset_beats(&beats);
+    reset_beats(beats);
 }
 
 void set_beats_frequency(Beats* beats, uint32_t frequency_ms) {
@@ -81,57 +107,74 @@ void display_pattern(int8_t*  pattern,
 }
 
 // Callback to setup input challenge for the previously displayed beat pattern
-void expect_displayed_pattern() {
+void finally_input_displayed_pattern() {
     input.playing = true;
     input.index = 0;
     input.count = display.count;
     input.pattern = display.pattern;
-    set_beats_frequency(&input, 1000); // TODO: replace with input timeout frequency
+    set_beats_frequency(&input, INPUT_TIMEOUT_MS);
 
     // TODO: start input timer
 }
 
-void challenge_success() {
+void finally_challenge_success() {
     ++level_number;
     // TODO: transmit level number
 }
 
-void challenge_fail() {
+void finally_challenge_fail() {
     // TODO: transmit fail
 }
+
+void beat_test() {
+	init_beats();
+	display_pattern(pattern_1, 6, 1000, finally_input_displayed_pattern);
+}
+
 
 // TODO: for the following, reduce the timer to a really short period if it isn't shorter than that
 // Timer interrupt reads code and compares input to pattern
 // Reduce timer to 1 clock tick to only accept a single button press
 // TODO: Button interrupts to light up LEDs (using input.code) while taking input
-void led_pin_interrupt_to_rename_1() {
-    input.code |= XOOO;
-}
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    // Clear LED pins
+    clear_beats_leds();
 
-void led_pin_interrupt_to_rename_2() {
-    input.code |= OXOO;
-}
+	// TODO Light up corresponding LED for a moment
 
-void led_pin_interrupt_to_rename_3() {
-    input.code |= OOXO;
-}
+	// Set input code depending on the button/s pressed
+	switch (GPIO_Pin) {
+	case INPUT_PIN_0:
+		input.code |= XOOO;
+		break;
+	case INPUT_PIN_1:
+		input.code |= OXOO;
+		break;
+	case INPUT_PIN_2:
+		input.code |= OOXO;
+		break;
+	case INPUT_PIN_3:
+		input.code |= OOOX;
+		break;
+	default:
+		break;
+	}
 
-void led_pin_interrupt_to_rename_4() {
-    input.code |= OOOX;
+	// TODO Set timer really close to the ARR if it isn't past this value
 }
 
 // timer interrupt to read codes
 void timer_input_interrupt_to_rename() {
-    // Stop accepting input on errors in pattern or index
+    // Stop accepting input when pattern is invalid or index out of range
     if ((input.pattern == 0x00)
     ||  (input.index >= input.count)) {
-        stop_beat_player(&input);
+        reset_beats(&input);
         return;
     }
 
     // Input code did not match beat pattern
     if (input.code != input.pattern[input.index]) {
-        input.finally = challenge_fail;
+        input.finally = finally_challenge_fail;
         finalise_beats(&input);
         return;
     }
@@ -141,7 +184,7 @@ void timer_input_interrupt_to_rename() {
 
     // Last code of beat pattern was played successfully
     if (input.index >= input.count) {
-        input.finally = challenge_success;
+        input.finally = finally_challenge_success;
         finalise_beats(&input);
     }
 }
@@ -158,12 +201,15 @@ void timer_display_interrupt_to_rename() {
     // Get the current beat code
     display.code = display.pattern[display.index];
 
-    // TODO: Set LED pins to LOW/HIGH as coded
-    // TODO: This is temporary: Extract desired LED states from bitmask
-    bool led_states[4] = {false, false, false, false};
-    for (int i = 0; i < 4; --i) {
-        led_states[i] = (display.code >> (3 - i)) && (1);
+    // Clear LED pins
+    clear_beats_leds();
+
+    // Set LED pins to LOW/HIGH as coded
+    uint16_t pin_set = 0;
+    for (int i = 0; i < LED_PIN_COUNT; --i) {
+        pin_set |= LED_PINS[i] * ((display.code >> (LED_PIN_COUNT - 1 - i)) && (1));
     }
+    HAL_GPIO_WritePin(GPIOC, pin_set, GPIO_PIN_SET);
 
     // Go to the next beat code
     ++display.index;
