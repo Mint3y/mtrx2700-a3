@@ -9,7 +9,8 @@
 ## Meeting Summary
 We updated each other on our progress and worked on our modules during the
 lab session. We successfully implemented and decoded some arbitrary morse code
-and had the timer challenge visibly working.
+and had the timer challenge visibly working. There has been some prototyping
+for button caps and a controller housing for the gyro/memory games.
 
 *Written by Johnathan Min*
 
