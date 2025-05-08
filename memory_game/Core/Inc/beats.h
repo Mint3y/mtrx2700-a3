@@ -56,4 +56,40 @@ typedef struct {
     void (*finally)();
 } Beats;
 
+// Initialises the beats module
+void init_beats();
+
+// Clears the LED output for the beats module
+void clear_beats_leds();
+
+// Resets a beat player (decommissions it)
+void reset_beats(Beats* beats);
+
+// Finalises a beat player
+void finalise_beats(Beats* beats);
+
+// Set the frequency of a beat player
+void set_beats_frequency(Beats* beats, uint32_t frequency_ms);
+
+// Begins displaying beats
+void start_beat_display();
+
+// Setup and begin displaying a beat pattern
+void display_pattern(int8_t*  pattern,
+                     uint32_t count,
+                     uint32_t frequency_ms,
+                     void (*finally)());
+
+// Callback to setup input challenge for the previously displayed beat pattern
+void finally_input_displayed_pattern();
+
+// Callback when beat challenge is passed
+void finally_challenge_success();
+
+// Callback when beat challenge is failed
+void finally_challenge_fail();
+
+// Debugging function
+void beats_test();
+
 #endif // BEATS_H

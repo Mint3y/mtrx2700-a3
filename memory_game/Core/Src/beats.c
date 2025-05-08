@@ -17,10 +17,10 @@ static uint16_t LED_PINS[LED_PIN_COUNT] = {
     LED_PIN_2,
     LED_PIN_3
 };
-static uint16_t LED_PINS_BITMASK = (GPIO_PIN_0
-                                 |  GPIO_PIN_1
-                                 |  GPIO_PIN_2
-                                 |  GPIO_PIN_3);
+static uint16_t LED_PINS_BITMASK = (LED_PIN_0
+                                 |  LED_PIN_1
+                                 |  LED_PIN_2
+                                 |  LED_PIN_3);
 
 // The pins used for input
 //static GPIO_TypeDef* INPUT_GPIO = GPIOA;
@@ -39,6 +39,15 @@ static uint32_t level_number = 0;
 static uint16_t INPUT_TIMEOUT_MS = 30000; // TODO configure timeout to something that isnt 30000ms
 // TODO: input alignment factor (how close to the actual beat the player needs to hit)
 
+
+void init_beats() {
+    reset_beats(&display);
+    reset_beats(&input);
+
+    // TODO: enable timer interrupt
+    // TODO: set timer interrupt
+}
+
 void clear_beats_leds() {
     HAL_GPIO_WritePin(LED_GPIO, LED_PINS_BITMASK, GPIO_PIN_RESET);
 }
@@ -55,14 +64,6 @@ void reset_beats(Beats* beats) {
 
     // Clear LED pins
     clear_beats_leds();
-}
-
-void init_beats() {
-    reset_beats(&display);
-    reset_beats(&input);
-
-    // TODO: enable timer interrupt
-    // TODO: set timer interrupt
 }
 
 void finalise_beats(Beats* beats) {
@@ -126,9 +127,11 @@ void finally_challenge_fail() {
     // TODO: transmit fail
 }
 
-void beat_test() {
-	init_beats();
-	display_pattern(pattern_1, 6, 1000, finally_input_displayed_pattern);
+void beats_test() {
+    HAL_GPIO_WritePin(LED_GPIO, LED_PIN_0, GPIO_PIN_SET);
+
+//	init_beats();
+//	display_pattern(pattern_1, 6, 1000, finally_input_displayed_pattern);
 }
 
 
@@ -209,7 +212,7 @@ void timer_display_interrupt_to_rename() {
     for (int i = 0; i < LED_PIN_COUNT; --i) {
         pin_set |= LED_PINS[i] * ((display.code >> (LED_PIN_COUNT - 1 - i)) && (1));
     }
-    HAL_GPIO_WritePin(GPIOC, pin_set, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED_GPIO, pin_set, GPIO_PIN_SET);
 
     // Go to the next beat code
     ++display.index;
