@@ -1,0 +1,13 @@
+C:/Users/jimmy/Downloads/MTRX2700-2025-main/MTRX2700-2025-main/stm32f303-definitions/Core/Inc/core_cm4.h:1688:22:__NVIC_EnableIRQ	2
+../Src/main.c:33:6:enable_clocks	1
+../Src/main.c:56:6:initialise_board	1
+../Src/main.c:70:6:trigger_prescaler	1
+../Src/main.c:96:6:timer_init	1
+../Src/main.c:135:6:TIM2_IRQHandler	3
+../Src/main.c:145:6:blink_led1	1
+../Src/main.c:154:6:reset_period	1
+../Src/main.c:177:10:get_period	1
+../Src/main.c:182:6:TIM3_IRQHandler	4
+../Src/main.c:197:6:start_oneshot_timer_TIM3	1
+../Src/main.c:220:6:blink_led2	1
+../Src/main.c:241:5:main	3
