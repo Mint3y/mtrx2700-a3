@@ -17,6 +17,8 @@ various ideas we selected one per person and decided to combine them together
 by creating the story that the player is in a dungeon and has to pass through
 5 doors (5 challenges) to obtain a treasure.
 
+*Written by Johnathan Min*
+
 ## Work Allocation
 - **James: Morse-Code Challenge.** Decode a morse code signal.
 - **Oscar: Timer Challenge.** Similar to arcade tower stacking game.
