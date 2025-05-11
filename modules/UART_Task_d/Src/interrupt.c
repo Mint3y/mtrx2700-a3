@@ -29,7 +29,7 @@ void finished_transmission(uint8_t *user_buffer, uint32_t message_length) {
     USART1->CR1 |= USART_CR1_TXEIE;    // Enable transmit interrupt to start sending
 }
 
-void USART1_EXTI25_IRQHandler(void)
+void USART1_IRQHandler(void)
 {
     if (USART1->ISR & USART_ISR_RXNE) {  // Check if data has been received
         uint8_t incoming_byte = USART1->RDR;  // Read the character
