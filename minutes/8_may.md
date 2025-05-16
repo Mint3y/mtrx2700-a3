@@ -1,4 +1,4 @@
-# Minutes 1st May
+# Minutes 8th May
 ## Participants
 - James
 - Oscar
