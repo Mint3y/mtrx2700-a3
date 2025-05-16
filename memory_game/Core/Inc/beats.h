@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include "stm32f3xx_hal.h"
+#include "timer.h"
 
 // Beats for rhythm game
 // #define OOOO 0b00000000
@@ -48,6 +49,7 @@
 #define INPUT_PIN_3 GPIO_PIN_4
 
 typedef struct {
+	Timer    timer;
     bool     playing;
     uint32_t index;
     uint32_t count;
@@ -91,5 +93,11 @@ void finally_challenge_fail();
 
 // Debugging function
 void beats_test();
+
+void input_pattern_next();
+
+void display_next();
+
+void display_all_off();
 
 #endif // BEATS_H
