@@ -44,6 +44,10 @@ void timer_restart(Timer* timer) {
 	timer_enable(timer);
 }
 
+void timer_enable_oneshot(Timer* timer) {
+	timer->ptr->CR1 |= TIM_CR1_OPM;
+}
+
 void timer_set_downcount(Timer* timer) {
 	timer->ptr->CR1 |= TIM_CR1_DIR;
 }
@@ -104,6 +108,21 @@ void timer_trigger_prescaler(Timer* timer) {
 
 void example_timer2_init() {
 	Timer pulse_timer = timer_init(TIM2, 0x00, TIM2_IRQn, 1);
+	timer_set_reload(&pulse_timer, 1000);
+}
+
+void example_callback_TIM2_IRQHandler() {
+	// Clear timer interrupt flag
+	if (TIM2->SR & TIM_SR_UIF) {
+		// Your code here
+
+		TIM2->SR &= ~TIM_SR_UIF;
+
+		// Clear capture/compare interrupt flag
+		if (TIM2->SR & TIM_SR_CC1IF) {
+			TIM2->SR &= ~TIM_SR_CC1If;
+		}
+	}
 }
 
 
