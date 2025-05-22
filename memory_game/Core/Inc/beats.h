@@ -58,6 +58,21 @@ typedef struct {
     void (*finally)();
 } Beats;
 
+typedef struct {
+	int8_t* pattern;
+	uint32_t pattern_length;
+	uint32_t on_period;
+	uint32_t off_period;
+	uint32_t input_timeout;
+} Level;
+
+typedef enum {
+	IDLE,
+	DISPLAY,
+	INPUT,
+	DELAY
+} Mode;
+
 // Initialises the beats module
 void init_beats();
 
