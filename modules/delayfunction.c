@@ -17,7 +17,7 @@ void delay(uint32_t ms) {
     (void)RCC->APB1ENR;
 
     TIM2->CR1 &= ~TIM_CR1_CEN;     // Stop timer if running
-    TIM2->PSC = 47999;              // Assuming 8 MHz clock: 1ms tick
+    TIM2->PSC = 47999;              // Assuming 8 * 6 MHz clock: 1ms tick
     TIM2->ARR = ms;
     TIM2->CNT = 0;
     TIM2->EGR = TIM_EGR_UG;
