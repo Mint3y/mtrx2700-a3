@@ -19,10 +19,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include <stdint.h>
+#include <timer3.h>
 #include "enable.h"
 #include "led.h"
 #include "adc.h"
-#include "timer.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -110,15 +110,16 @@ int main(void)
   enable_clocks();
   initialise_board();
   enable_ADC();
-
-  uint32_t buffer = 120;
+  uint32_t buffer = 50;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint16_t set_voltage = ReadADC();
+
   TIM2->CCR1 = 1000;
-  for (uint32_t i = 1; i < 800000; i++){}
+
+  delay(250);
   TIM2->CCR1 = 0;
 
   while (1)
@@ -126,13 +127,13 @@ int main(void)
 	  uint16_t current_voltage = ReadADC();
 		if (current_voltage - buffer > set_voltage || current_voltage + buffer < set_voltage){
 			set_led_register(1);
-			for (uint32_t i = 1; i < 10000000; i++){}
+			delay(1000);
 			current_voltage = ReadADC();
 			if (current_voltage - buffer > set_voltage || current_voltage + buffer < set_voltage){
 			set_led_register(3);
 			TIM2->CCR1 = 2000;
 			//about 90 degrees
-			for (uint32_t i = 1; i < 1000000; i++){}
+			delay(250);
 			TIM2->CCR1 = 0;
 			while(1){}
 			}
