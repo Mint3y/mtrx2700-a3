@@ -105,8 +105,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  beats_test();
-//  init_buttons();
+//  beats_test();
+  init_buttons();
   while (1)
   {
     /* USER CODE END WHILE */

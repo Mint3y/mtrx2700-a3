@@ -50,6 +50,9 @@
 #define INPUT_PIN_2 GPIO_PIN_3
 #define INPUT_PIN_3 GPIO_PIN_4
 
+#define DEFAULT_FLASH_COUNT 3
+#define DEFAULT_FLASH_PERIOD 1000
+
 typedef struct {
 	Timer    timer;
     bool     playing;
@@ -126,5 +129,7 @@ void button_callback(uint16_t led_number);
 void input_pattern_next();
 
 void display_next();
+
+void display_wait();
 
 #endif // BEATS_H
