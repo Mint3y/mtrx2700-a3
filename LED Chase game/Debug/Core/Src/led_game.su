@@ -1,0 +1,4 @@
+../Core/Src/led_game.c:14:6:initialise_board	4	static
+../Core/Src/led_game.c:29:6:SetSingleLED	16	static
+../Core/Src/led_game.c:40:6:ShowTargetLED	8	static
+../Core/Src/led_game.c:58:9:PlayChaseGame	32	static

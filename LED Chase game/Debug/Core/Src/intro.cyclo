@@ -1,0 +1,3 @@
+../Core/Src/intro.c:4:6:print_intro	6
+../Core/Src/intro.c:38:6:print_morse_puzzle	6
+../Core/Src/intro.c:69:6:print_correct_response	6

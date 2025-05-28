@@ -1,0 +1,4 @@
+../Core/Src/morse.c:17:13:pwm_on	4	static
+../Core/Src/morse.c:22:13:pwm_off	4	static
+../Core/Src/morse.c:44:20:lookup_morse	24	static
+../Core/Src/morse.c:54:6:play_morse	32	static

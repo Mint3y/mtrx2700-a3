@@ -1,0 +1,7 @@
+../Drivers/CMSIS/Include/core_cm4.h:1688:22:__NVIC_EnableIRQ	2
+../Drivers/CMSIS/Include/core_cm4.h:1816:22:__NVIC_SetPriority	2
+../Core/Src/interrupt.c:20:6:finished_transmission	2
+../Core/Src/interrupt.c:33:6:USART1_IRQHandler	6
+../Core/Src/interrupt.c:73:6:enable_interrupt	1
+../Core/Src/interrupt.c:83:9:serial_message_available	1
+../Core/Src/interrupt.c:87:6:get_serial_message	3
