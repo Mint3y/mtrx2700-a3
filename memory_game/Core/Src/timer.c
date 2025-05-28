@@ -1,5 +1,11 @@
 #include "timer.h"
 
+void timer_rcc_init() {
+	RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+	RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
+	RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
+}
+
 Timer timer_init(TIM_TypeDef* timer_ptr,
 				 void (*callback)(),
 				 IRQn_Type timer_number,
@@ -97,7 +103,7 @@ void timer_trigger_prescaler(Timer* timer) {
 	timer_set_count(timer, 0);
 
 	// Short delay so timer can reset the prescaler upon reload
-	for (int i = 0; i < 3; ++i) {
+   	for (int i = 0; i < 3; ++i) {
 		asm("NOP");
 	}
 
@@ -120,7 +126,7 @@ void example_callback_TIM2_IRQHandler() {
 
 		// Clear capture/compare interrupt flag
 		if (TIM2->SR & TIM_SR_CC1IF) {
-			TIM2->SR &= ~TIM_SR_CC1If;
+			TIM2->SR &= ~TIM_SR_CC1IF;
 		}
 	}
 }

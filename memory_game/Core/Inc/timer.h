@@ -9,6 +9,8 @@ typedef struct {
 	void (*callback)();
 } Timer;
 
+void timer_rcc_init();
+
 // Create a timer
 Timer timer_init(TIM_TypeDef* timer_ptr,
 				 void (*callback)(),

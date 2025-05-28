@@ -42,6 +42,8 @@
 #define LED_PIN_3 GPIO_PIN_3
 #define LED_PIN_COUNT 4
 
+#define LED_DEBUG_PIN GPIO_PIN_3
+
 // Input button pin definitions
 #define INPUT_PIN_0 GPIO_PIN_1
 #define INPUT_PIN_1 GPIO_PIN_2
@@ -67,11 +69,16 @@ typedef struct {
 } Level;
 
 typedef enum {
+	UNINITIALISED,
+	FAILED,
 	IDLE,
 	DISPLAY,
 	INPUT,
-	DELAY
+	DELAY,
+	FLASHING
 } Mode;
+
+void init_buttons();
 
 // Initialises the beats module
 void init_beats();
@@ -85,17 +92,22 @@ void reset_beats(Beats* beats);
 // Finalises a beat player
 void finalise_beats(Beats* beats);
 
-// Set the frequency of a beat player
-void set_beats_frequency(Beats* beats, uint32_t frequency_ms);
-
 // Begins displaying beats
 void start_beat_display();
+
+void flash_start(uint32_t flash_count, uint32_t period);
+
+void flash_callback();
 
 // Setup and begin displaying a beat pattern
 void display_pattern(int8_t*  pattern,
                      uint32_t count,
                      uint32_t frequency_ms,
                      void (*finally)());
+
+void play_level(uint32_t level_number);
+
+void finally_start_active_level();
 
 // Callback to setup input challenge for the previously displayed beat pattern
 void finally_input_displayed_pattern();
@@ -109,10 +121,10 @@ void finally_challenge_fail();
 // Debugging function
 void beats_test();
 
+void button_callback(uint16_t led_number);
+
 void input_pattern_next();
 
 void display_next();
-
-void display_all_off();
 
 #endif // BEATS_H

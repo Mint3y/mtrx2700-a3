@@ -90,6 +90,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /* USER CODE END SysInit */
 
@@ -105,6 +106,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   beats_test();
+//  init_buttons();
   while (1)
   {
     /* USER CODE END WHILE */
@@ -346,6 +348,14 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
+//	HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
+//	HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+//	HAL_NVIC_SetPriority(EXTI2_TSC_IRQn, 0, 0);
+//	HAL_NVIC_EnableIRQ(EXTI2_TSC_IRQn);
+//	HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+//	HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+//	HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
+//	HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
