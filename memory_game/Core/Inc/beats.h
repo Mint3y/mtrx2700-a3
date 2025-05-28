@@ -54,7 +54,6 @@
 #define DEFAULT_FLASH_PERIOD 1000
 
 typedef struct {
-	Timer    timer;
     bool     playing;
     uint32_t index;
     uint32_t count;

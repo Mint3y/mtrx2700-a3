@@ -24,9 +24,12 @@ static uint16_t INPUT_PINS[4] = {
 // State
 static Mode mode = UNINITIALISED;
 
+// Main timer
+static Timer main_timer;
+static void (*main_finally)() = 0x00;
+
 // Display
 static Beats display;
-//static bool display_showing;
 static bool display_finalise_on_next;
 static bool input_finalised;
 static bool user_is_inputting;
@@ -36,9 +39,10 @@ static Beats input;
 static uint16_t INPUT_TIMEOUT_MS = 3000;
 static uint16_t INPUT_RESET_SPEED = 400;
 
-// Flashing mode
-static Timer main_timer;
-static void (*main_finally)() = 0x00;
+// Flashing component
+static uint32_t flash_end_count = 0;
+static uint32_t flashes_elapsed = 0;
+static bool flash_on = true;
 
 // Levels
 static uint32_t level_number = 0;
@@ -180,28 +184,12 @@ void init_beats() {
 	// Setup input from GPIO pins
 	init_buttons();
 
-	// Debug: Enable board LED output registers
-	// uint16_t *debug_output_reg = ((uint16_t *)&(GPIOE->MODER)) + 1;
-	// *debug_output_reg = 0x5555;
-
-	// Setup timers and beat displayers
-//    display.timer = timer_init(TIM2, 0x00, TIM2_IRQn, 1);
-//    timer_set_prescaler(&(display.timer), 8000 * 6 - 1);
-//
-//    display_off = timer_init(TIM4, 0x00, TIM4_IRQn, 1);
-//    timer_set_prescaler(&display_off, 8000 * 6 - 1);
-//
-//    input.timer = timer_init(TIM3, 0x00, TIM3_IRQn, 1);
-//    timer_set_prescaler(&(input.timer), 8000 * 6 - 1);
-
+	// Setup main timer
     main_timer = timer_init(TIM4, 0x00, TIM4_IRQn, 1);
     timer_set_prescaler(&main_timer, 8000 * 6 - 1);
     main_finally = 0x00;
 
-
-
     // Reset flags
-//    display_showing = false;
     display_finalise_on_next = false;
     input_finalised = false;
     user_is_inputting = false;
@@ -212,11 +200,6 @@ void init_beats() {
 }
 
 void reset_beats(Beats* beats) {
-//    // Stop beats timer
-//	timer_disable(&(beats->timer));
-//	timer_set_count(&(beats->timer), 0);
-//    timer_set_callback(&(beats->timer), 0x00);
-
     // Reset the beats information
     beats->playing = false;
     beats->index = 0;
@@ -233,10 +216,6 @@ void finalise_beats(Beats* beats) {
 
     reset_beats(beats);
 }
-
-static uint32_t flash_end_count = 0;
-static uint32_t flashes_elapsed = 0;
-static bool flash_on = true;
 
 void flash_start(uint32_t flash_count, uint32_t period) {
 	// Store flash parameters
@@ -323,7 +302,6 @@ void display_pattern(int8_t*  pattern,
     mode = DISPLAY;
     timer_set_callback(&main_timer, display_next);
 	timer_restart(&main_timer);
-//	timer_restart(&display_off);
 }
 
 // Callback to setup input challenge for the previously displayed beat pattern
@@ -332,11 +310,7 @@ void finally_input_displayed_pattern() {
     mode = INPUT;
 	timer_disable(&main_timer);
 
-//	timer_disable(&display_off);
-//	timer_set_count(&display_off, 0);
-//	timer_set_callback(&display_off, 0x00);
-
-//	display_showing = false;
+	// Reset flags
 	display_finalise_on_next = false;
 	input_finalised = false;
 	user_is_inputting = false;
@@ -359,7 +333,7 @@ void finally_challenge_success() {
 	mode = DISPLAY;
 	timer_disable(&main_timer);
 
-	// TODO check if i can remove this
+	// Reset flags
 	input_finalised = true;
 	user_is_inputting = false;
 
@@ -376,19 +350,6 @@ void finally_challenge_success() {
 
     // Play the next level
     play_level(level_number);
-
-
-
-    // TODO Setup and start the beat display
-//    display.playing = true;
-//    display.index = 0;
-//    display.count = count;
-//    display.pattern = pattern;
-//    display.finally = finally;
-//    set_beats_frequency(&display, frequency_ms);
-//    start_beat_display();
-
-    // TODO: transmit level number
 }
 
 void finally_challenge_fail() {
@@ -505,22 +466,6 @@ void input_pattern_next() {
     }
 }
 
-//void TIM3_IRQHandler() {
-//	// Clear interrupt flag
-//	if (TIM3->SR & TIM_SR_UIF) {
-//		TIM3->SR &= ~TIM_SR_UIF;
-//
-//		// Clear capture/compare flag
-//		if (TIM3->SR & TIM_SR_CC1IF) {
-//			TIM3->SR &= ~TIM_SR_CC1IF;
-//		}
-//	}
-//
-//	if (input.timer.callback != 0x00) {
-//		input.timer.callback();
-//	}
-//}
-
 void display_next() {
 	// Finished displaying after previous wait
 	if (display_finalise_on_next) {
@@ -574,22 +519,6 @@ void display_wait() {
     timer_set_count(&main_timer, 1);
 }
 
-//void TIM2_IRQHandler() {
-//	// Clear interrupt flag
-//	if (TIM2->SR & TIM_SR_UIF) {
-//		TIM2->SR &= ~TIM_SR_UIF;
-//
-//		// Clear capture/compare flag
-//		if (TIM2->SR & TIM_SR_CC1IF) {
-//			TIM2->SR &= ~TIM_SR_CC1IF;
-//		}
-//	}
-//
-//	if (display.timer.callback != 0x00) {
-//		display.timer.callback();
-//	}
-//}
-
 void TIM4_IRQHandler() {
 	// Clear interrupt flag
 	if (TIM4->SR & TIM_SR_UIF) {
@@ -605,10 +534,6 @@ void TIM4_IRQHandler() {
 	if (main_timer.callback != 0x00) {
 		main_timer.callback();
 	}
-
-//	if (display_off.callback != 0x00) {
-//		display_off.callback();
-//	}
 }
 
 void EXTI0_IRQHandler() {
