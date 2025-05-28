@@ -12,15 +12,6 @@ static uint16_t LED_PINS_BITMASK = (LED_PIN_0
                                  |  LED_PIN_1
                                  |  LED_PIN_2);
 
-// The pins used for input
-static GPIO_TypeDef* INPUT_GPIO = GPIOA;
-static uint16_t INPUT_PINS[4] = {
-    INPUT_PIN_0,
-    INPUT_PIN_1,
-    INPUT_PIN_2,
-	INPUT_PIN_3
-};
-
 // State
 static Mode mode = UNINITIALISED;
 
@@ -115,11 +106,6 @@ void set_beats_leds(uint16_t pins) {
 
 void clear_beats_leds() {
     HAL_GPIO_WritePin(LED_GPIO, LED_PINS_BITMASK, GPIO_PIN_RESET);
-}
-
-void beats_test() {
-	init_beats();
-	display_pattern(pattern_1, 6, 1000, finally_input_displayed_pattern);
 }
 
 void init_buttons() {
@@ -259,7 +245,8 @@ void play_level(uint32_t level_number) {
 	// Set the level
 	active_level = levels + level_number;
 
-	// Level preparation delay
+	// Level preparation delay and change state
+	mode = FLASHING;
 	main_finally = finally_start_active_level;
 	flash_start(DEFAULT_FLASH_COUNT, DEFAULT_FLASH_PERIOD);
 }
@@ -277,7 +264,6 @@ void finally_start_active_level() {
                     finally_input_displayed_pattern);
 }
 
-// Setup to display a beat pattern
 void display_pattern(int8_t*  pattern,
                      uint32_t count,
                      uint32_t frequency_ms,
@@ -304,7 +290,6 @@ void display_pattern(int8_t*  pattern,
 	timer_restart(&main_timer);
 }
 
-// Callback to setup input challenge for the previously displayed beat pattern
 void finally_input_displayed_pattern() {
 	// Change program state
     mode = INPUT;
@@ -321,11 +306,18 @@ void finally_input_displayed_pattern() {
     input.index = 0;
     input.count = display.count;
     input.pattern = display.pattern;
-    timer_set_reload(&main_timer, INPUT_TIMEOUT_MS);
 
     // Start input
+    timer_set_reload(&main_timer, INPUT_TIMEOUT_MS);
     timer_set_callback(&main_timer, input_pattern_next);
 	timer_restart(&main_timer);
+}
+
+void module_complete_callback() {
+	timer_disable(&main_timer);
+	if (finally_module_complete != 0x00) {
+		finally_module_complete();
+	}
 }
 
 void finally_challenge_success() {
@@ -342,7 +334,14 @@ void finally_challenge_success() {
 
     // Enable all LEDs upon completing the final level
     if (level_number >= MAX_LEVEL) {
-        mode = IDLE;
+    	// Enter module completion state
+        mode = COMPLETE;
+    	main_finally = finally_module_complete;
+    	timer_set_callback(&main_timer, module_complete_callback);
+    	timer_set_reload(&main_timer, module_completion_delay_ms);
+    	timer_restart(&main_timer);
+
+        // Light up all LEDs
     	enable_debug_led();
     	set_beats_leds(LED_PIN_0 | LED_PIN_1 | LED_PIN_2);
     	return;
@@ -370,7 +369,7 @@ void blue_button_callback() {
 	// Start the beats game
 	switch (mode) {
 	case UNINITIALISED:
-		mode = IDLE;
+		mode = FLASHING;
 		init_beats();
 		play_level(0);
 		break;
@@ -380,10 +379,8 @@ void blue_button_callback() {
 	}
 }
 
-// Timer interrupt reads code and compares input to pattern
-// Reduce timer to 1 clock tick to only accept a single button press
 void button_callback(uint16_t led_number) {
-	// Check that we're in input mode
+	// Check that the program is in input state
 	if (mode != INPUT) {
 		return;
 	}
@@ -397,8 +394,7 @@ void button_callback(uint16_t led_number) {
 	user_is_inputting = true;
 	disable_debug_led();
 
-    // Clear LED pins
-    clear_beats_leds();
+    // Light up pressed LED
     set_beats_leds(led_number);
 
 	// Set input code depending on the button/s pressed
@@ -417,8 +413,8 @@ void button_callback(uint16_t led_number) {
 	}
 
 	// Check if timer is past post push threshold
-	uint32_t input_time_remaining = (timer_get_count(&(input.timer))
-			                      -  timer_get_reload(&(input.timer)));
+	uint32_t input_time_remaining = (timer_get_count(&main_timer)
+			                      -  timer_get_reload(&main_timer));
 	if (input_time_remaining <= INPUT_RESET_SPEED) {
 		return;
 	}
@@ -427,7 +423,6 @@ void button_callback(uint16_t led_number) {
 	timer_set_count(&main_timer, INPUT_TIMEOUT_MS - INPUT_RESET_SPEED);
 }
 
-// timer interrupt to read codes
 void input_pattern_next() {
 	clear_beats_leds();
 

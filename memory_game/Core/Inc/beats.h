@@ -7,27 +7,6 @@
 #include "stm32f3xx_hal.h"
 #include "timer.h"
 
-// Beats for rhythm game
-// #define OOOO 0b00000000
-// #define OOOX 0b00000001
-// #define OOXO 0b00000010
-// #define OOXX 0b00000011
-
-// #define OXOO 0b00000100
-// #define OXOX 0b00000101
-// #define OXXO 0b00000110
-// #define OXXX 0b00000111
-
-// #define XOOO 0b00001000
-// #define XOOX 0b00001001
-// #define XOXO 0b00001010
-// #define XOXX 0b00001011
-
-// #define XXOO 0b00001100
-// #define XXOX 0b00001101
-// #define XXXO 0b00001110
-// #define XXXX 0b00001111
-
 // Beat definitions
 #define OOOO 0b00000000
 #define OOOX 0b00000001
@@ -73,62 +52,93 @@ typedef struct {
 typedef enum {
 	UNINITIALISED,
 	FAILED,
-	IDLE,
+	COMPLETE,
 	DISPLAY,
 	INPUT,
 	DELAY,
 	FLASHING
 } Mode;
 
+// The function to run upon completing the module
+static void (*finally_module_complete)() = 0x00;
+static uint32_t module_completion_delay_ms = 1000;
+
+// Enables the debugging (yellow) LED
+void enable_debug_led();
+
+// Disables the debugging LED
+void disable_debug_led();
+
+// Sets LEDs according to the given GPIO pins
+void set_beats_leds(uint16_t pins);
+
+// Clears all LEDs connected to GPIO pins
+void clear_beats_leds();
+
+// Initialises the blue button and GPIO buttons
+// Must be called to allow the blue button to access
+// the program entry point
 void init_buttons();
 
 // Initialises the beats module
+// Will be called after pressing the blue button if
+// init buttons was previously called
 void init_beats();
 
-// Clears the LED output for the beats module
-void clear_beats_leds();
-
-// Resets a beat player (decommissions it)
+// Resets the contents of a beats struct
 void reset_beats(Beats* beats);
 
-// Finalises a beat player
+// Performs a beat's finally function and then resets it
 void finalise_beats(Beats* beats);
 
-// Begins displaying beats
-void start_beat_display();
-
+// Begins a sequence of flashes with the given parameters
+// Will call the finally function of the main timer
 void flash_start(uint32_t flash_count, uint32_t period);
 
+// Callback used to perform the flashes
 void flash_callback();
 
-// Setup and begin displaying a beat pattern
+// Performs a flash sequence and sets the active level
+// Changes main finally to start active level
+void play_level(uint32_t level_number);
+
+// Starts playing the active level
+void finally_start_active_level();
+
+// Display a given pattern
 void display_pattern(int8_t*  pattern,
                      uint32_t count,
                      uint32_t frequency_ms,
                      void (*finally)());
 
-void play_level(uint32_t level_number);
-
-void finally_start_active_level();
-
 // Callback to setup input challenge for the previously displayed beat pattern
 void finally_input_displayed_pattern();
 
-// Callback when beat challenge is passed
+// Callback that executes finally module complete after the completion delay
+void module_complete_callback();
+
+// Callback representing input challenge success
+// Plays the next level or turns all LEDs on if on the final level
 void finally_challenge_success();
 
-// Callback when beat challenge is failed
+// Callback representing input challenge failure
+// Enters an endless flashing loop
 void finally_challenge_fail();
 
-// Debugging function
-void beats_test();
+// Callback for the blue button
+// Allows entry into the beats module
+void blue_button_callback();
 
+//  Callback for GPIO buttons
 void button_callback(uint16_t led_number);
 
+// Reads in the input from the buttons
 void input_pattern_next();
 
+// Displays the next pattern in the beatmap
 void display_next();
 
+// Displays the next pattern in the beatmap after a delay
 void display_wait();
 
 #endif // BEATS_H
