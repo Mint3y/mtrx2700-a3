@@ -1,4 +1,4 @@
-# MTRX2700 Embedded Escape Room – Group 3
+# MTRX2700 Treasure Hunt Training – Group 3
 
 ## Semester
 **S1 2025** – The University of Sydney  
