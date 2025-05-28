@@ -66,19 +66,20 @@ static int8_t pattern_3[] = {
     OOXO,
     OXOO,
     OOOX,
-	OXOO
+	OXOO,
+	OOXO
 };
 static const Level level_1 = {
 	pattern_1,
 	sizeof(pattern_1) / sizeof(pattern_1[0]),
-	7000,
+	700,
 	300,
 	2000
 };
 static const Level level_2 = {
 	pattern_2,
 	sizeof(pattern_2) / sizeof(pattern_2[0]),
-	600,
+	400,
 	400,
 	2000
 };
@@ -293,7 +294,7 @@ void finally_start_active_level() {
 	// Start active level
 	display_pattern(active_level->pattern,
 					active_level->pattern_length,
-                    active_level->on_period,
+                    active_level->off_period,
                     finally_input_displayed_pattern);
 }
 
@@ -327,8 +328,10 @@ void display_pattern(int8_t*  pattern,
 
 // Callback to setup input challenge for the previously displayed beat pattern
 void finally_input_displayed_pattern() {
-	// Stop display
+	// Change program state
+    mode = INPUT;
 	timer_disable(&main_timer);
+
 //	timer_disable(&display_off);
 //	timer_set_count(&display_off, 0);
 //	timer_set_callback(&display_off, 0x00);
@@ -347,28 +350,32 @@ void finally_input_displayed_pattern() {
     timer_set_reload(&main_timer, INPUT_TIMEOUT_MS);
 
     // Start input
-    mode = INPUT;
     timer_set_callback(&main_timer, input_pattern_next);
 	timer_restart(&main_timer);
 }
 
 void finally_challenge_success() {
-    mode = DISPLAY;
+	// Change program state
+	mode = DISPLAY;
+	timer_disable(&main_timer);
+
+	// TODO check if i can remove this
 	input_finalised = true;
 	user_is_inputting = false;
-	enable_debug_led();
-	set_beats_leds(LED_PIN_0 | LED_PIN_1 | LED_PIN_2);
 
 	// Go to next level
     ++level_number;
 
-    // Stop at final level
+    // Enable all LEDs upon completing the final level
     if (level_number >= MAX_LEVEL) {
         mode = IDLE;
+    	enable_debug_led();
+    	set_beats_leds(LED_PIN_0 | LED_PIN_1 | LED_PIN_2);
     	return;
     }
 
-//    play_level(level_number);
+    // Play the next level
+    play_level(level_number);
 
 
 
@@ -385,16 +392,17 @@ void finally_challenge_success() {
 }
 
 void finally_challenge_fail() {
+	// Change program state
 	mode = FAILED;
 
+	// Clear beat LEDs
 	input_finalised = true;
 	user_is_inputting = false;
 	clear_beats_leds();
 
+	// Enter an infinite loop
 	main_finally = finally_challenge_fail;
 	flash_start(DEFAULT_FLASH_COUNT, DEFAULT_FLASH_PERIOD);
-
-    // TODO: transmit fail
 }
 
 void blue_button_callback() {
