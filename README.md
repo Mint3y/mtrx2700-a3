@@ -19,7 +19,7 @@ This project implements a multi-stage **embedded escape room** using **STM32F3 D
 | Oscar       | Timer Game & Serial Comm    | Designed LED chase minigame with levels and serial UART feedback   |
 | Marco       | Gyroscope Compass Lead      | Built IMU compass module with calibration, filtering, and directional feedback via STM32 LEDs     |
 | James       | Riddle & Morse Code Lead    | Created interactive riddle and Morse code system using PWM buzzer output and GUI planning         |
-| Ben         | Pressure Sensor Developer   | Developed analog pressure plate puzzle using voltage divider and ADC interpretation               |
+| Ben         | Pressure Sensor Developer   | Developed analog pressure plate using voltage divider and ADC interpretation, implement motor     |
 | Johnathan   | Memory Game  | Implemented LED/button memory game with modular logic and physical user interface enhancements     |
 
 ---
@@ -54,7 +54,7 @@ This project implements a multi-stage **embedded escape room** using **STM32F3 D
 |--------------------|-----------------------------------------------|----------------------------------------|----------------------------------------|--------|
 | Memory        | LED/button sequence validation                | Repeat correct pattern                 | Player progresses/fails appropriately  | ✅     |
 | Timer Game         | LED stop timing and feedback                  | Button press at correct moment         | UART and LED indicate result           | ✅     |
-| Pressure Plate     | Weight change detection                       | Swap object on plate                   | LED/buzzer response triggered          | ✅     |
+| Pressure Plate     | Weight change detection                       | Swap object on plate                   | LED/motor response triggered           | ✅     |
 | Compass            | Heading accuracy and stability                | Rotate board, track direction          | Accurate feedback toward North         | ✅     |
 | Morse Code         | Buzzer playback and decode timing             | Listen and interpret Morse code        | Player identifies correct answer       | ✅     |
 
@@ -68,7 +68,7 @@ This project implements a multi-stage **embedded escape room** using **STM32F3 D
 - STM32CubeIDE
 - USB cables
 - Serial terminal (Cutecom / PuTTY)
-- Breadboards, resistors, buttons, buzzer, sensors, LEDs, transistors
+- Breadboards, resistors, buttons, buzzer, sensors, LEDs, transistors, op-amp
 
 ### Build Instructions
 
@@ -82,7 +82,7 @@ This project implements a multi-stage **embedded escape room** using **STM32F3 D
 ## 🏁 Integration and Flow
 
 Players must **complete each puzzle** to progress through a sequence of five “doors.”  
-Each STM32 board acts as one level. Upon solving a puzzle, the system:
+Each module acts as one level. Upon solving a puzzle, the system:
 - Provides success/failure feedback (LED, buzzer, motor)
 - Sends or triggers the next challenge (via UART or external signal)
 
