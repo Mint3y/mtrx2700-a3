@@ -69,6 +69,18 @@ void print_intro(void) {
         while (!(USART1->ISR & USART_ISR_TC));  // Wait until transmission complete
     }
 ```
+#### How Button Presses Are Checked
+
+- At the start, the code selects a random target LED (between 1 and 7) and flashes it briefly. The player needs to remember which LED was the target.
+- The game then cycles the white LEDs, lighting them up one at a time from left to right and back again.
+- When the player presses the button, the `stop_chase` flag is set. This is usually done inside a button interrupt.
+- The program checks which LED was last lit before the button press (this value is stored as `final_led`).
+    - If `final_led` matches the target LED chosen at the beginning, the player wins the round. The game continues to the next stage or resets as needed.
+    - If `final_led` does not match the target, the red LED (or possibly a buzzer, depending on configuration) flashes on and off three times to indicate failure.
+- After either outcome, the game resets so another attempt can be made.
+- Missing the correct timing or remembering the wrong LED will result in the failure indication.
+
+The logic is straightforward but can be challenging depending on the speed and attention of the player.
 
 ### Breadboard Setup
 
