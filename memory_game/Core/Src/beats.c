@@ -78,14 +78,14 @@ static const Level level_1 = {
 static const Level level_2 = {
 	pattern_2,
 	sizeof(pattern_2) / sizeof(pattern_2[0]),
-	400,
-	400,
+	300,
+	300,
 	2000
 };
 static const Level level_3 = {
 	pattern_3,
 	sizeof(pattern_3) / sizeof(pattern_3[0]),
-	400,
+	300,
 	200,
 	2000
 };
@@ -366,7 +366,7 @@ void finally_challenge_fail() {
 
 	// Enter an infinite loop
 	main_finally = finally_challenge_fail;
-	flash_start(DEFAULT_FLASH_COUNT, DEFAULT_FLASH_PERIOD);
+	flash_start(DEFAULT_FLASH_COUNT, DEFAULT_FLASH_PERIOD / 2);
 }
 
 void blue_button_callback() {
