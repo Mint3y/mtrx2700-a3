@@ -38,7 +38,7 @@ This project implements a multi-stage **embedded escape room** using **STM32F3 D
 
 ### UART Messaging Protocol
 
-This project uses UART to communicate between the STM32 microcontroller and a Python-based GUI. The cotnroller sends  messages to the GUI, which the GUI then displays in a organised and themed manner. The GUI can respond to user interaction either through the microntroller and UART or inputs directly into the GUI in the form of answers.
+This project uses UART to communicate between the STM32 microcontroller and a Python-based GUI which is ran locally on the device using vscode. The controller sends  messages to the GUI, which the GUI then displays in a organised and themed manner. The GUI can respond to user interaction either through the microntroller and UART or inputs directly into the GUI in the form of answers.
 
 #### Message Structure
 
