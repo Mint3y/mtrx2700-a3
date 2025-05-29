@@ -151,7 +151,7 @@ This project implements a digital compass using the STM32F3 Discovery Board's bu
 **ENU Direction Cosine Matrix**  
 _Converts vector from body frame to navigation frame_:
 
-<img src="Screenshot%202025-05-29%20142000.png" width="400" height="400" alt="ENU Direction Cosine Matrix" />
+<img src="Screenshot%202025-05-29%20142000.png" width="1000" height="400" alt="ENU Direction Cosine Matrix" />
 
 **4. Displaying Compass Direction**  
 - With pitch and roll from the filter, we compute the **heading angle**.
