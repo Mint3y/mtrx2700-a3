@@ -112,7 +112,44 @@ Below is a photo of the actual breadboard wiring for this project:
 <img src="IMG_2079.jpg" alt="Breadboard Setup" width="400"/>
 
 ---
+BOULDERRUN
 
+Equipment:
+1. STM32 x1
+2. male-female wires x6
+3. 1k resistor x1
+4. Op-amp x1
+5. Breadboard wires
+6. Pressure resistor
+7. Micro serveo
+8. tooth pick x2
+9. Boulder run side x2
+10. Ramp insert x2
+11. Motor holder x1
+12. Pressureplate stable x1
+13. PressurePlateMTRX2700 x2
+
+Construction:
+1. Break the toothpicks in half and insert into the holes of one of the pressure plates.
+2. Glue the toothpicks up straight in the holes.
+3. Insert the stabilizers in the toothpicks.
+4. Place he other pressure plate ontop of the toothpicks.
+5. Glue the pressure resistor in the middle of the two boards and solder wires to extend the pins.
+6. Using a breadboard make a op-amp buffer with the + input connected to a voltage divider with the 1k resistor connected to power and the pressure resistor to ground.
+7. Connect PA0 to the output of the buffer, 3V from the board to the breadboard and ground to the breadboard.
+8. Connect the ramp sides, motor holder and ramp inserts together to make the boulder ramp.
+9. Place the motor in the motor holder and connect the power to 5V, ground to ground and the PWM to PA15.
+
+How it works:
+The code sets pin PA0 to an ADC and PA15 to a PWM with TIM2. The code starts by taking the current analog signal [set_voltage = ReadADC()] from the pin and uses it as a base range that must be kept within with a buffer variable. Then the code constantly reads the analog input from PA0 and compares it to the base voltage with a buffer. Such as [if (current_voltage - buffer > set_voltage || current_voltage + buffer < set_voltage)]. If a change is detected that is outside of the scope one LED will turn on with [set_led_register(1)] to indicate to the user that they have one second [delay(1000)] to replace a similar mass on the pressure plate. After one second if the analog voltage read is within the scope than nothing happens and the LED turns off. However if the read voltage is still out of the scope than the motor will turn by 45 degrees counter-clockwise [TIM2->CCR1 = 2000] then [delay(250); TIM2->CCR1 = 0;] (to simulate 45 degrees) and release the boulder. 
+
+Modifications:
+- Buffer can be increased to make the game easier or decreased to make it harder.
+- The delay time can be increased/decreased to make the grace period between switching the masses easier/harder.  
+
+Test:
+Run the code with an object on the pressure plate, slowly add weight to the board and observe if an LED turns on, if it does, do the opposite and remove a little bit of weight slowly and check if an LED turns on. If it does the pressure plate works and the board is reading the pins correctly. If not check that the buffer isn't too big also remove the pressure plate cover and test just the resistor. Can also use a multimeter to check that the voltage divider is working.
+---
 ## ⚙️ Software Architecture
 
 - **Modular C** code (`.c/.h` files) with clear separation
