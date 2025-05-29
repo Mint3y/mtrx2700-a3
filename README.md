@@ -68,6 +68,7 @@ void print_intro(void) {
         }
         while (!(USART1->ISR & USART_ISR_TC));  // Wait until transmission complete
     }
+```c
 
 ### Breadboard Setup
 
