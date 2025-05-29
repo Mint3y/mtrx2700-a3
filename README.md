@@ -123,6 +123,62 @@ Below is a photo of the actual breadboard wiring for this project:
 <img src="IMG_2079.jpg" alt="Breadboard Setup" width="400"/>
 
 ---
+# COMPASS IMPLEMENTATION
+### IMU Compass using STM32F3 Discovery Board
+
+This project implements a digital compass using the STM32F3 Discovery Board's built-in **gyroscope**, **accelerometer**, and **magnetometer** (IMU sensors).
+
+---
+
+#### 📌 Project Workflow
+
+**1. Reading Sensor Data**  
+- The STM32F3 Discovery Board provides BSP (Board Support Package) functions to read raw data directly from the IMU sensors via I2C.
+
+**2. Calibration**  
+- Even at rest, sensors produce small bias values.
+- Calibration involves:
+  - Keeping the board still
+  - Collecting multiple raw samples
+  - Averaging to calculate bias
+  - Subtracting the bias from future readings
+
+**3. Filtering (Sensor Fusion)**  
+- Sensor values fluctuate even after calibration.
+- We apply the **Madgwick filter** to fuse 9-axis IMU data and compute orientation.
+- Orientation is defined in the **ENU (East-North-Up)** frame.
+
+**ENU Direction Cosine Matrix**  
+_Converts vector from body frame to navigation frame_:
+
+<img src="Screenshot%202025-05-29%20142000.png" width="400" height="400" alt="ENU Direction Cosine Matrix" />
+
+**4. Displaying Compass Direction**  
+- With pitch and roll from the filter, we compute the **heading angle**.
+- The heading is mapped to cardinal directions and displayed using onboard LEDs.
+
+---
+
+#### 🔧 Example Code Snippet
+
+```c
+int main(void) {
+    BSP_IMU_Init();                  // Initialize sensors
+    calibrate_sensors();             // Calculate and apply bias
+    Madgwick_Init(1.0f / 256.0f);    // Filter update interval
+
+    while (1) {
+        SensorData data = read_all();             // Raw + bias corrected
+        Quaternion q = Madgwick_Update(data);     // Orientation estimation
+        float heading = compute_heading(q);       // Calculate heading
+        display_heading_on_LEDs(heading);         // Output via LEDs
+        HAL_Delay(50);
+    }
+}
+
+
+---
+
 # Challenges 4 and 5
 ## MEMORY CHALLENGE
 The player must repeat LED/button sequences across levels with increasing difficulty.
