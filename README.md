@@ -36,7 +36,38 @@ This project implements a multi-stage **embedded escape room** using **STM32F3 D
 
 ## Challenge 1 and 2
 
-Description here
+### UART Messaging Protocol
+
+This project uses UART to communicate between the STM32 microcontroller and a Python-based GUI. The cotnroller sends  messages to the GUI, which the GUI then displays in a organised and themed manner. The GUI can respond to user interaction either through the microntroller and UART or inputs directly into the GUI in the form of answers.
+
+#### Message Structure
+
+- **Each message** is an array of strings, sent line by line
+- **Lines** are terminated with standard line endings (`\r`, `\r\n`)
+- **Blank lines** are transmitted as `\r\n` to create visual spacing in the GUI
+- **End of message** is  (`~`) at the end of the final line
+
+#### Example C Implementation
+
+```c
+// Example function to send the intro message over UART
+void print_intro(void) {
+    const char *message_lines[] = {
+        "Welcome to Treasure Hunter Training!",
+        // ... lines omitted for brevity ...
+        "Press the blue button to begin your journey!~"  // End marker
+    };
+
+    for (int i = 0; i < sizeof(message_lines) / sizeof(message_lines[0]); i++) {
+        const char *line = message_lines[i];
+        const char *to_send = (line[0] == '\0') ? "\r\n" : line;
+
+        for (int j = 0; j < strlen(to_send); j++) {
+            while (!(USART1->ISR & USART_ISR_TXE)); // Wait until TX buffer is empty
+            USART1->TDR = to_send[j];
+        }
+        while (!(USART1->ISR & USART_ISR_TC));  // Wait until transmission complete
+    }
 
 ### Breadboard Setup
 
