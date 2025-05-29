@@ -65,7 +65,8 @@ The STM32 can’t safely supply enough current to power multiple LEDs directly. 
 
 Below is a photo of the actual breadboard wiring for this project:
 
-![Breadboard Setup](IMG_2079.jpg)
+<img src="IMG_2079.jpg" alt="Breadboard Setup" width="400"/>
+
 ---
 
 ## ⚙️ Software Architecture
