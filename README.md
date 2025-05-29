@@ -112,7 +112,17 @@ Below is a photo of the actual breadboard wiring for this project:
 <img src="IMG_2079.jpg" alt="Breadboard Setup" width="400"/>
 
 ---
-BOULDERRUN
+# Challenges 4 and 5
+## MEMORY CHALLENGE
+The player must repeat LED/button sequences across levels with increasing difficulty.
+
+There are 3 levels in total, with varying sequences and light-up frequencies. The module is capable of running on a single STM32 timer and has a completion callback that can be set by other modules. The completion callback will run when the player is successful. Skipping has been implemented for debugging purposes. The module can be skipped by clicking the blue button 3 times when the debug (yellow) LED is flashing. The module is started by pressing the blue button and only requires `init_buttons()` to be called prior to entering an infinite loop.
+
+To modify the existing patterns more `Level`s can be added to the beats.c file. These levels can be configured according to the members of the `Level` struct in `beats.h`, to change the delay/number of levels.
+
+Additional `finally*` functions can be added and integrated to change the functionality at the end of levels.
+
+## BOULDER RUN
 
 Equipment:
 1. STM32 x1
