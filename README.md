@@ -162,19 +162,34 @@ _Converts vector from body frame to navigation frame_:
 #### 🔧 Example Code Snippet
 
 ```c
-int main(void) {
-    BSP_IMU_Init();                  // Initialize sensors
-    calibrate_sensors();             // Calculate and apply bias
-    Madgwick_Init(1.0f / 256.0f);    // Filter update interval
+// Gyro: from mdps to rad/s
+	  float gx = corrected_gyro_x * (M_PI / 180000.0f);
+	  float gy = corrected_gyro_y * (M_PI / 180000.0f);
+	  float gz = corrected_gyro_z * (M_PI / 180000.0f);
 
-    while (1) {
-        SensorData data = read_all();             // Raw + bias corrected
-        Quaternion q = Madgwick_Update(data);     // Orientation estimation
-        float heading = compute_heading(q);       // Calculate heading
-        display_heading_on_LEDs(heading);         // Output via LEDs
-        HAL_Delay(50);
-    }
-}
+	  // Accel: milli-g => convert to g
+	  float ax = corrected_acc_x / 1000.0f;
+	  float ay = corrected_acc_y / 1000.0f;
+	  float az = corrected_acc_z / 1000.0f;
+
+	  // Madgwick Filter
+	  float mx = corrected_mag_x;
+	  float my = corrected_mag_y;
+	  float mz = corrected_mag_z;
+
+	  MadgwickAHRSupdate(gx, gy, gz, ax, ay, az, mx, my, mz);
+
+	  // roll and pitch formula from Madgwick Filter formula
+	  float roll  = atan2f(q0 * q1 + q2 * q3, 0.5f - q1 * q1 - q2 * q2);
+	  float pitch = asinf(-2.0f * (q1 * q3 - q0 * q2));
+
+	  // Projectile value
+	  float Xh = mx * cosf(pitch) + mz * sinf(pitch);
+	  float Yh = mx * sinf(roll) * sinf(pitch) + my * cosf(roll) - mz * sinf(roll) * cosf(pitch);
+
+	  // Calculate heading of magnetometer in degree
+	  float mag_heading = atan2f(-Yh, Xh) * (180.0f / M_PI);
+	  if (mag_heading < 0) mag_heading += 360.0f;
 
 
 ---
