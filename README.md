@@ -49,7 +49,7 @@ This project uses UART to communicate between the STM32 microcontroller and a Py
 
 #### Example C Implementation
 
-```
+```c
 // Example function to send the intro message over UART
 void print_intro(void) {
     const char *message_lines[] = {
@@ -68,7 +68,7 @@ void print_intro(void) {
         }
         while (!(USART1->ISR & USART_ISR_TC));  // Wait until transmission complete
     }
-```c
+```
 
 ### Breadboard Setup
 
