@@ -81,6 +81,12 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
 
+/*The code below enables pin A5 to an ADC converter and constantly checks if the read voltage has gone
+ * out of range of the set buffer. If so one led turns on to notify the user they have one second to
+ * simulate the same voltage. If after one second the reading is still different the motor will turn counter-
+ * clockwise by 45 degrees. If after one second the voltage is set back to within teh buffer the light turns
+ * off and nothing happens. */
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -106,38 +112,55 @@ int main(void)
   MX_USB_PCD_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  /*enable pwm with timer 2 to pin A15*/
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   enable_clocks();
+  //Enable LEDs
   initialise_board();
+  //Enable ADC converter in pin A5
   enable_ADC();
+  //Buffer that the read voltage has to stay within.
   uint32_t buffer = 50;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  //This sets the base voltage that must kept within range of
   uint16_t set_voltage = ReadADC();
-
+//Rotate motor clockwise
   TIM2->CCR1 = 1000;
-
+//delay function delays the board by a certain time in ms
+//the delay is equivalent to 45 degrees
   delay(250);
+  //Stop motor
   TIM2->CCR1 = 0;
 
   while (1)
   {
+	  //Read the voltage
 	  uint16_t current_voltage = ReadADC();
+	  //If voltage is out of scope proceed
 		if (current_voltage - buffer > set_voltage || current_voltage + buffer < set_voltage){
+			//Turn on one LED
 			set_led_register(1);
+			//Wait 1 second
 			delay(1000);
+			//Check the current voltage again
 			current_voltage = ReadADC();
+			//Checks if still out of scope
 			if (current_voltage - buffer > set_voltage || current_voltage + buffer < set_voltage){
+			//Turn on two LEDs
 			set_led_register(3);
+			//Rotate motor counter-clockwise
 			TIM2->CCR1 = 2000;
-			//about 90 degrees
+			//Delay equivalent to 45 dgrees
 			delay(250);
 			TIM2->CCR1 = 0;
+			//Stop motor
 			while(1){}
 			}
 		}else{
+			//If voltage still in range do nothing and continue loop
 			set_led_register(0);
 			TIM2->CCR1 = 0;
 		}

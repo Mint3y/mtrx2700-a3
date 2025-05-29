@@ -1,5 +1,5 @@
 #include "stm32f303xc.h"
-
+//This file was used in the group however the timer was switched to timer3 as to not impact the pwm.
 volatile uint8_t delay_done = 0;
 
 void TIM3_IRQHandler(void) {
