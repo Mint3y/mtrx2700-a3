@@ -17,12 +17,14 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <delay.h>
 #include "main.h"
 #include <stdint.h>
-#include <timer3.h>
+#include <stdbool.h>
 #include "enable.h"
 #include "led.h"
 #include "adc.h"
+#include "beats.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -70,6 +72,12 @@ static void MX_TIM2_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+static bool memory_game_finished = false;
+
+void memory_game_complete() {
+	memory_game_finished = true;
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -80,6 +88,28 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+
+	  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	  HAL_Init();
+
+	  SystemClock_Config();
+
+	  __HAL_RCC_GPIOA_CLK_ENABLE();
+
+
+	  /* Initialize all configured peripherals */
+	  MX_GPIO_Init();
+	  MX_I2C1_Init();
+	  MX_SPI1_Init();
+	  MX_USB_PCD_Init();
+
+	  // Memory game
+	  init_buttons();
+	  finally_module_complete = memory_game_complete;
+
+	  while (memory_game_finished == false) {
+	  }
+
 
 /*The code below enables pin A5 to an ADC converter and constantly checks if the read voltage has gone
  * out of range of the set buffer. If so one led turns on to notify the user they have one second to
@@ -112,6 +142,8 @@ int main(void)
   MX_USB_PCD_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+
+
   /*enable pwm with timer 2 to pin A15*/
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   enable_clocks();
