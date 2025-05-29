@@ -3,7 +3,7 @@
 
 #ifndef ADC_H
 #define ADC_H
-
+//The following code was taken from the MTRX2700 GitHub and altered to what was needed.
 uint16_t ReadADC() {
 	// request the process to start
 	ADC1->CR |= ADC_CR_ADSTART;
@@ -18,6 +18,8 @@ uint16_t ReadADC() {
 void enable_ADC(void){
 	// enable the clock for ADC1
 	RCC->AHBENR |= RCC_AHBENR_ADC12EN;
+
+	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 
 	// set to synchronise the ADC with the clock
 	ADC12_COMMON->CCR |= ADC12_CCR_CKMODE_0;
@@ -36,7 +38,7 @@ void enable_ADC(void){
 	//  the second channel goes in SQ2
 	//  the number of channels to read = 1, so the L value is 0
 	ADC1->SQR1 = 0;
-	ADC1->SQR1 |= 0x01 << ADC_SQR1_SQ1_Pos; // set the request for channel 1
+	ADC1->SQR1 |= 0x01 << ADC_SQR1_SQ1_Pos; // set the request for channel 6
 	ADC1->SQR1 |= 0x00 << ADC_SQR1_L_Pos; // set the number of channels to read
 
 	// single shot mode
@@ -45,7 +47,7 @@ void enable_ADC(void){
 	// Enable the ADC
 	ADC1->CR |= ADC_CR_ADEN;
 
-	// Wait the ADC to be ready.
+	// Wait for the ADC to be ready.
 	while (ADC1->ISR == 0);
 }
 #endif
