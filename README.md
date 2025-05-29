@@ -83,7 +83,7 @@ void print_intro(void) {
 The logic is straightforward but can be challenging depending on the speed and attention of the player.
 
 #### How the Morse Code Works
-Each letter is converted to its Morse code, then the output (LED or sound) turns on and off with correct timing for dots, dashes, letters, and word spaces—making the message readable in Morse. In the end we used an LED as the piezo buzzer we have is too quiet to hear properly in a loud classroom setting. We thought about implementing both but the PWM that the buzzer requires is not compatible with the LED.
+Any word or string can be picked by changing the input in the function playmorse(). Each letter is converted to its Morse code, then the output (LED or sound) turns on and off with correct timing for dots, dashes, letters, and word spaces—making the message readable in Morse. In the end we used an LED as the piezo buzzer we have is too quiet to hear properly in a loud classroom setting. We thought about implementing both but the PWM that the buzzer requires is not compatible with the LED.
 
 
 - There is a  `morse_table` array holds the mapping of each letter and symbol. Each entry has the character and its Morse code, like `'A', ".-"` and so on.
