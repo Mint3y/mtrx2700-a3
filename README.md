@@ -141,6 +141,7 @@ Construction:
 9. Place the motor in the motor holder and connect the power to 5V, ground to ground and the PWM to PA15.
 
 How it works:
+
 The code sets pin PA0 to an ADC and PA15 to a PWM with TIM2. The code starts by taking the current analog signal [set_voltage = ReadADC()] from the pin and uses it as a base range that must be kept within with a buffer variable. Then the code constantly reads the analog input from PA0 and compares it to the base voltage with a buffer. Such as [if (current_voltage - buffer > set_voltage || current_voltage + buffer < set_voltage)]. If a change is detected that is outside of the scope one LED will turn on with [set_led_register(1)] to indicate to the user that they have one second [delay(1000)] to replace a similar mass on the pressure plate. After one second if the analog voltage read is within the scope than nothing happens and the LED turns off. However if the read voltage is still out of the scope than the motor will turn by 45 degrees counter-clockwise [TIM2->CCR1 = 2000] then [delay(250); TIM2->CCR1 = 0;] (to simulate 45 degrees) and release the boulder. 
 
 Modifications:
@@ -148,7 +149,9 @@ Modifications:
 - The delay time can be increased/decreased to make the grace period between switching the masses easier/harder.  
 
 Test:
+
 Run the code with an object on the pressure plate, slowly add weight to the board and observe if an LED turns on, if it does, do the opposite and remove a little bit of weight slowly and check if an LED turns on. If it does the pressure plate works and the board is reading the pins correctly. If not check that the buffer isn't too big also remove the pressure plate cover and test just the resistor. Can also use a multimeter to check that the voltage divider is working.
+
 ---
 ## ⚙️ Software Architecture
 
