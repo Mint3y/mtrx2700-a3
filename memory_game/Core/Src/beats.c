@@ -15,6 +15,10 @@ static uint16_t LED_PINS_BITMASK = (LED_PIN_0
 // State
 static Mode mode = UNINITIALISED;
 
+// Debug skip
+static uint32_t skip_presses = 0;
+static const uint32_t SKIP_CODE = 57;
+
 // Main timer
 static Timer main_timer;
 static void (*main_finally)() = 0x00;
@@ -374,8 +378,21 @@ void blue_button_callback() {
 		play_level(0);
 		break;
 
+	// Count presses while flashing
+	case FLASHING:
+		++skip_presses;
+		break;
+
 	default:
 		break;
+	}
+
+	// Skip beats challenge
+	if (skip_presses > 3 && skip_presses != SKIP_CODE) {
+		skip_presses = SKIP_CODE;
+		mode = COMPLETE;
+		level_number = MAX_LEVEL;
+		finally_challenge_success();
 	}
 }
 
