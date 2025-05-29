@@ -60,7 +60,12 @@ The STM32 can’t safely supply enough current to power multiple LEDs directly. 
 - Each PAx pin → 100Ω resistor (base) → NPN transistor base.
 - Collector: VCC (after passing through ~100Ω current-limiting resistor and LED).
 - Emitter: Ground.
+- 
+#### Example Breadboard Setup
 
+Below is a photo of the actual breadboard wiring for this project:
+
+![Breadboard Setup](IMG_2079.jpg)
 ---
 
 ## ⚙️ Software Architecture
