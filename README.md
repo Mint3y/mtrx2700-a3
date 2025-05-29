@@ -34,6 +34,32 @@ This project implements a multi-stage **embedded escape room** using **STM32F3 D
 | Compass Navigation| Guide player toward North using gyroscope/magnetometer heading detection    |
 | Morse Code Riddle | Decode a PWM buzzer message to unlock the final clue or instruction         |
 
+## Challenge 1 and 2
+
+Description here
+
+### Breadboard Setup
+
+The breadboard configuration uses 7 white LEDs and 1 red LED, each controlled via separate GPIO pins on the STM32 microcontroller:
+
+- **White LEDs (PA1–PA7):**
+  - Each white LED is connected to an individual STM32 GPIO pin (PA1 through PA7).
+  - Each LED is wired in series with its own resistor and NPN transistor.
+  - The PAx pin (where x = 1–7) provides a small current to the transistor base, allowing a larger current to flow from the breadboard’s VCC rail, through the resistor and LED, then to ground.
+  - This configuration offloads LED current from the microcontroller, preventing excessive draw on the STM32’s pins.
+
+- **Red LED (PA15 – Morse Code Output):**
+  - The red LED is set up similarly, using a resistor and NPN transistor.
+  - It is connected to PA15, which is mapped to the TIM2 timer peripheral for PWM or precise Morse code signaling in the code.
+  - Again, the transistor switches current from the VCC supply through the LED and resistor to ground, triggered by the PA15 pin.
+
+**Why transistors?**  
+The STM32 can’t safely supply enough current to power multiple LEDs directly. Transistors act as switches, letting the board’s power rail supply the required current while only a small control signal is needed from the microcontroller.
+
+**Wiring summary:**
+- Each PAx pin → 100Ω resistor (base) → NPN transistor base.
+- Collector: VCC (after passing through ~100Ω current-limiting resistor and LED).
+- Emitter: Ground.
 
 ---
 
